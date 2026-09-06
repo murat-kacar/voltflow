@@ -19,3 +19,8 @@ Bu komut sıfır LLM token maliyetiyle yerel Tree-sitter AST motorunu çalışt�
 - **Merkezi Düğümler (God Nodes):** `graphify-out/GRAPH_REPORT.md` içindeki aşırı bağlantılı sınıfları incele. Bu sınıflara dokunurken yan etkileri önceden planla.
 - **Kör Arama Yasağı:** Dosya aramak için asla `grep_search` ile tahmin yürütme; önce graftaki rotayı takip et.
 
+## 3. Mimari Bekleyen İşler ve Ertelenmiş Kontratlar (Deferred Domain Contracts)
+Grafta `src/contracts/deferred-domain-contracts.ts` altında tanımlı `DEFERRED_ARCHITECTURAL_REGISTRY` ve ilgili kontrat arayüzleri (`IdempotencyExecutionContract`, `AuditTrailRecord`, `RbacPolicyContract`, `EmailTransportContract`, `DistributedRateLimiterContract`, `RequestContextContract`, `DatabaseIntegrationTestLifecycle`) yer alır.
+- Yeni bir domain dilimi eklerken graftan bu kontratların etki alanını ve gereksinimlerini kontrol et.
+- İlgili domain devreye girdiğinde, bu kontratları karşılayan somut servisleri (`src/features/<slice>/`) bağla.
+

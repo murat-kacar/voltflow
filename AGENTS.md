@@ -27,9 +27,9 @@ Tahmin yürütmek, körlemesine dosya aramak ve tüm dosyayı baştan yazmak KES
 
 ## 2. Her Promptta İstisnasız Uygulanacak 6 Fazlı İş Akışı
 
-* **Faz 1 - Graf Tabanlı Keşif:** `graphify-out/graph.json` veya `graphify-out/GRAPH_REPORT.md` dosyasını oku *(eğer dosya henüz yoksa önce terminalde `pnpm run graph` çalıştırarak haritayı üret)*. Değiştirilecek sembolün bağımlılıklarını ve etki alanını (blast radius) belirle; gereksiz dosya okumaktan kaçın.
+* **Faz 1 - Graf Tabanlı Keşif:** `graphify-out/graph.json` veya `graphify-out/GRAPH_REPORT.md` dosyasını oku *(eğer dosya henüz yoksa önce terminalde `pnpm run graph` çalıştırarak haritayı üret)*. Değiştirilecek sembolün bağımlılıklarını, etki alanını (blast radius) ve `src/contracts/deferred-domain-contracts.ts` altındaki bekleyen kontrat ilişkilerini belirle; gereksiz dosya okumaktan kaçın.
 * **Faz 2 - Tarihçe ve Konfigürasyon:** Kritik satırlar için `git blame` ile niyet kontrolü yap; gerekirse `.env` / config uyumunu denetle.
-* **Faz 3 - Kontrat / Tip Önceliği (Spec-First):** Gövde kodunu değiştirmeden önce tip veya arayüz kontratını doğrula.
+* **Faz 3 - Kontrat / Tip Önceliği (Spec-First):** Gövde kodunu değiştirmeden önce tip veya arayüz kontratını doğrula. Yeni bir iş mantığı (ödeme, yetki, denetim, dış entegrasyon) ekleniyorsa, `src/contracts/deferred-domain-contracts.ts` içindeki ilgili bekleyen kontratı implemente et ve durumunu güncelle.
 * **Faz 4 - Cerrahi Müdahale:** Sadece `replace_file_content` veya `multi_replace_file_content` ile nokta atışı yama yap. Üretilen gövde kodu **Bölüm 3'teki Kanonik Standartlara (Validation, Idempotency, AAA, Loglama)** eksiksiz uymak zorundadır.
 * **Faz 5 - Kapalı Döngü Doğrulama:** Değişiklik sonrası `pnpm run check` (Biome + tsc) çalıştır, testleri yürüt. Hata varsa kullanıcıya bildirmeden önce kendi içinde düzelt.
 * **Faz 6 - Graf Senkronizasyonu:** Yapısal bir değişiklik yapıldıysa terminalde `pnpm run graph` çalıştırarak haritayı güncelle.
@@ -39,48 +39,49 @@ Tahmin yürütmek, körlemesine dosya aramak ve tüm dosyayı baştan yazmak KES
 
 ## 3. Kanonik Mimari ve Güvenlik Standartları (DDD, AAA & Observability)
 
-Yapay zekanın üreteceği veya refactor edeceği kodlarda aşağıdaki endüstri standartları istisnasız uygulanacaktır:
+Yapay zekanın üreteceği veya refactor edeceği kodlarda aşağıdaki endüstri standartları istisnasız uygulanacaktır.
+Bu standartların bir kısmı jenerik çekirdekte aktifken, iş mantığına (domain logic) bağlı olanlar **"Doğal Eksik / Bekleyen Kontrat"** olarak `src/contracts/deferred-domain-contracts.ts` altında tiplenmiştir ve ilgili domain eklendiğinde devreye alınacaktır:
 
-### A. DDD ve Sınırlı Bağlamlar (Bounded Contexts)
-- **Modüler Ayrım:** Kod tabanı dikey dilimlere (Domain / Feature Slices) bölünmelidir.
+### A. DDD ve Sınırlı Bağlamlar (Bounded Contexts) `[DURUM: AKTİF]`
+- **Modüler Ayrım:** Kod tabanı dikey dilimlere (Domain / Feature Slices - `src/features/*`) bölünmelidir.
 - **God Node Yasağı:** Çok amaçlı devasa `utils` veya `helpers` dosyaları oluşturulamaz. Yardımcı fonksiyonlar ilgili domain sınırları içinde tutulmalıdır.
 - **Amaç:** Graphify üzerindeki graf kümelerini temiz tutmak ve etki alanını (blast radius) domain sınırında izole etmek.
 
-### B. Kanonik İsimlendirme ve Ortak Dil (Ubiquitous Language)
+### B. Kanonik İsimlendirme ve Ortak Dil (Ubiquitous Language) `[DURUM: AKTİF]`
 - Kısaltma ve muğlak isimlendirmeler (`usr_chk`, `fn1`, `tempData`) yasaktır.
 - Fonksiyon ve değişken isimleri iş mantığını açıkça belirten, niyet odaklı ve kendini açıklayan (intention-revealing) biçimde seçilmelidir (`authenticateUserWithPassword`, `revokeRefreshToken`).
 
 ### C. Kimlik, Yetki ve Oturum Standartları (AAA & Modern Security)
-- **Token Saklama:** Hassas JWT ve oturum anahtarları **asla `localStorage`'da saklanamaz**. Daima `HttpOnly`, `Secure`, `SameSite=Strict/Lax` çerezler (cookies) kullanılmalıdır.
-- **Authentication (AuthN):** Modern OAuth 2.1 / OIDC akışları, Refresh Token Rotation ve güvenli oturum sonlandırma uygulanmalıdır.
-- **Authorization (AuthZ):** Kod içerisine dağılmış spagetti kontroller yerine merkezi, bildirimsel (declarative) RBAC (Role-Based) veya ABAC guard/middleware yapıları kullanılmalıdır.
-- **Accounting (Audit Trail):** Kritik veri değişikliklerinde (bakiye, yetki, profil silme vb.) *"Kim, ne zaman, hangi kaydı değiştirdi?"* denetim logu tutulmalıdır.
+- **Token Saklama `[DURUM: AKTİF]`:** Hassas JWT ve oturum anahtarları **asla `localStorage`'da saklanamaz**. Daima `HttpOnly`, `Secure`, `SameSite=Strict/Lax` çerezler (cookies) kullanılmalıdır.
+- **Authentication (AuthN) `[DURUM: AKTİF]`:** Better-Auth oturum akışları ve güvenli oturum sonlandırma uygulanmıştır.
+- **E-Posta İletimi `[DURUM: DOĞAL EKSİK / BEKLEYEN KONTRAT]`:** Prodüksiyon e-posta servisi (Resend/SendGrid) bağlanana kadar geliştirme konsol emülasyonu devrededir (`EmailTransportContract`).
+- **Authorization (AuthZ & RBAC) `[DURUM: DOĞAL EKSİK / BEKLEYEN KONTRAT]`:** Çok kiracılı organizasyon ve rol politikaları, iş modeli (admin/satıcı/müşteri) tanımlandığında `schema.ts`'ye eklenecektir (`RbacPolicyContract`).
+- **Accounting (Audit Trail) `[DURUM: DOĞAL EKSİK / BEKLEYEN KONTRAT]`:** Kritik veri değişikliklerinde tutulacak `audit_logs` tablosu, denetlenecek domain varlıkları netleştiğinde aktif edilecektir (`AuditTrailRecord`).
 
 ### D. Yapılandırılmış Loglama ve İzlenebilirlik (Structured Logging)
-- `console.log` veya düz metin print yasaktır.
-- Loglar JSON formatında, standart log seviyeleriyle (`INFO`, `WARN`, `ERROR`), zaman damgası ve istek takibi için **Correlation ID / Trace ID** ile üretilmelidir.
+- **JSON Formatı `[DURUM: AKTİF]`:** `console.log` yasaktır. Loglar JSON formatında, standart log seviyeleriyle (`INFO`, `WARN`, `ERROR`) `logger.ts` üzerinden üretilmektedir.
+- **Otomatik Bağlam (Request Context) `[DURUM: DOĞAL EKSİK / BEKLEYEN KONTRAT]`:** Gelen HTTP isteklerindeki `traceId`'nin downstream çağrılara otomatik aktarımı, API uç noktaları derinleştikçe `AsyncLocalStorage` ile bağlanacaktır (`RequestContextContract`).
 
-### E. Sınırda Veri Doğrulama (Boundary Input Validation)
-- Dış dünyadan gelen hiçbir veriye (HTTP gövdesi, query parametreleri, webhook yükleri) körü körüne güvenilemez.
-- Tüm girdiler servis katmanına ulaşmadan önce katı bir şema motoru (Zod, Pydantic vb.) ile çalışma zamanında doğrulanmalıdır (runtime validation).
+### E. Sınırda Veri Doğrulama (Boundary Input Validation) `[DURUM: AKTİF]`
+- Dış dünyadan gelen hiçbir veriye körü körüne güvenilemez.
+- Tüm girdiler servis katmanına ulaşmadan önce katı bir şema motoru (`zod`, `drizzle-zod`) ile çalışma zamanında doğrulanmaktadır (`src/db/validation.ts`).
 
-### F. Veritabanı ve İşlem Bütünlüğü (Database Transactions & Atomicity)
-- İki veya daha fazla tabloyu/dokümanı değiştiren ilişkili yazma işlemlerinde yarım kalma (partial failure) riskine izin verilemez.
-- Çok adımlı operasyonlar daima atomik bir veritabanı işlemi (Transaction / Unit of Work) bloğunda yürütülmeli; hata anında tam rollback yapılmalıdır.
+### F. Veritabanı ve İşlem Bütünlüğü (Database Transactions & Atomicity) `[DURUM: AKTİF / HAZIR]`
+- İki veya daha fazla tabloyu değiştiren ilişkili yazma işlemlerinde yarım kalma (partial failure) riskine izin verilemez.
+- Çok adımlı operasyonlar daima atomik bir veritabanı işlemi (`db.transaction`) bloğunda yürütülmeli; hata anında tam rollback yapılmalıdır.
 
-### G. Standart Hata Yönetimi (Uniform Error Envelope)
+### G. Standart Hata Yönetimi (Uniform Error Envelope) `[DURUM: AKTİF]`
 - Her uç noktadan farklı JSON hata formatları dönmek yasaktır.
-- Tüm sistem RFC 7807 (Problem Details) veya standart bir hata zarfı (`{ success: false, error: { code, message, details } }`) dönmelidir. Ham sistem/stack trace hataları istemciye asla sızdırılamaz.
+- Tüm sistem RFC 7807 (Problem Details) veya standart bir hata zarfı (`createErrorResponse` / `createSuccessResponse`) dönmektedir (`src/lib/api-response.ts`). Ham sistem/stack trace hataları istemciye asla sızdırılamaz.
 
-### H. Tip Güvenli Merkezi Konfigürasyon (Type-Safe Env)
-- Kod içerisine serpiştirilmiş `process.env.VAR` veya `os.environ.get()` kullanımı yasaktır.
-- Tüm çevre değişkenleri tek bir merkezi konfigürasyon modülü üzerinden şema ile doğrulanıp tip güvenli olarak dışa aktarılmalıdır.
+### H. Tip Güvenli Merkezi Konfigürasyon (Type-Safe Env) `[DURUM: AKTİF]`
+- Kod içerisine serpiştirilmiş `process.env.VAR` kullanımı yasaktır.
+- Tüm çevre değişkenleri tek bir merkezi konfigürasyon modülü (`src/lib/env.ts`) üzerinden şema ile doğrulanıp tip güvenli olarak dışa aktarılmaktadır.
 
 ### I. İdempotens, Hız Sınırlama ve Yürütme Korumaları (Idempotency & Execution Guards)
-- **İdempotens (Çift Tetikleme Koruması):** Ödeme, sipariş oluşturma ve harici webhook gibi kritik operasyonlarda aynı parametrelerle mükerrer çalıştırma engellenmelidir. `Idempotency-Key` mekanizması işletilerek mükerrer isteklerde eski sonuç dönülmeli, işlem yeniden yürütülmemelidir.
-- **Hız Sınırlama ve Kotalar (Rate Limiting & Quotas):** OTP SMS isteme, şifre sıfırlama veya arama uç noktaları gibi kaynak tüketen işlemlerde IP veya Kullanıcı bazlı zaman pencereleri (Sliding Window vb.) tanımlanmalı; aşımda RFC 6585 (`429 Too Many Requests`) dönülmelidir.
-- **Yarış Durumu ve Tekil Çalıştırma (Concurrency Lock / Mutex):** Aynı anda yalnızca tek bir kullanıcının tüketebileceği hassas kaynaklarda (tek kullanımlık kupon, bilet rezervasyonu) dağıtık kilit (Distributed Lock / DB Row Lock) kullanılmalıdır.
-- **Sınırda Uygulama (Guards / Middleware):** Bu denetimler iş mantığı fonksiyonlarının içine spagetti `if` olarak gömülemez; Middleware, Guard veya Dekoratör katmanında bildirimsel (declarative) olarak uygulanmalıdır.
+- **Hız Sınırlama (Rate Limiting) `[DURUM: KISMİ AKTİF (Yerel sliding window), DAĞITIK BEKLEYEN KONTRAT]`:** Tek instance için in-memory sliding window aktiftir. Sunucusuz/multi-pod ortamında Upstash Redis ile değiştirilecektir (`DistributedRateLimiterContract`).
+- **İdempotens (Çift Tetikleme Koruması) `[DURUM: DOĞAL EKSİK / BEKLEYEN KONTRAT]`:** Ödeme, sipariş oluşturma ve hassas webhook'larda mükerrer çalıştırmayı engelleyen `Idempotency-Key` tablosu ve guard'ı, ilgili domain dilimi açıldığında devreye alınacaktır (`IdempotencyExecutionContract`).
+- **Sınırda Uygulama `[DURUM: AKTİF]`:** Tüm korumalar iş mantığından izole olarak Proxy / Middleware katmanında (`src/proxy.ts`) uygulanmaktadır.
 
 ---
 
