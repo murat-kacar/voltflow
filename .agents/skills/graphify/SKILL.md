@@ -10,11 +10,9 @@ Bu beceri, projenin deterministik ilişkisel grafiğini (`graphify-out/graph.jso
 ## 1. Grafiği Başlatma veya Güncelleme
 Eğer projede `graphify-out/graph.json` yoksa veya yapısal (sınıf/fonksiyon/arayüz) değişiklik yapıldıysa:
 ```powershell
-$env:PATH = "C:\Users\Victus\.local\bin;" + $env:PATH
-graphify . --code-only
-graphify cluster-only .
+pnpm run graph
 ```
-Bu komut sıfır LLM token maliyetiyle yerel Tree-sitter AST motorunu çalıştırır ve `graphify-out/graph.json`, `graphify-out/GRAPH_REPORT.md` ve görsel `graphify-out/graph.html` dosyalarını üretir.
+Bu komut sıfır LLM token maliyetiyle yerel Tree-sitter AST motorunu çalıştırır ve `graphify-out/graph.json`, `graphify-out/GRAPH_REPORT.md` ve görsel `graphify-out/graph.html` dosyalarını üretir. Ayrıca `graphify tree` komutu ile katlanabilir hiyerarşik ağaç (`graphify-out/GRAPH_TREE.html`) üretilebilir.
 
 ## 2. Grafikten Bilgi Çekme Yöntemi
 - **Etki Alanı (Blast Radius):** Değiştirilecek fonksiyonu hangi dosyaların import ettiğini ve kimlerin çağırdığını `graphify-out/graph.json` içindeki bağımlılık düğümlerinden bul.
