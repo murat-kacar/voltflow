@@ -12,6 +12,13 @@ GitHub Settings → Environments altında `staging` ve `production` environment'
 
 VPS üzerinde Docker ve Compose Plugin kurulmalıdır. Repository VPS'e clone edilir. Proje kökünde yalnızca sunucu üzerinde oluşturulan `.env.production` dosyası bulunur:
 
+| GitHub environment | Branch | VPS yolu | Alan adı | Veritabanı |
+| --- | --- | --- | --- | --- |
+| `staging` | `staging` | `/opt/voltflow-staging` | `staging.example.com` | ayrı staging PostgreSQL |
+| `production` | `main` | `/opt/voltflow-production` | `app.example.com` | ayrı production PostgreSQL |
+
+Her VPS'te `VPS_APP_PATH`, tabloda belirtilen mutlak yol olmalıdır. İki ortam aynı VPS üzerinde çalıştırılmamalı; staging verisi production veritabanına veya secret'ına bağlanmamalıdır.
+
 ```env
 POSTGRES_DB=gag
 POSTGRES_USER=gag
@@ -32,6 +39,22 @@ docker compose --profile tools --env-file .env.production -f docker-compose.prod
 ```
 
 `BETTER_AUTH_URL` alan adı ve HTTPS reverse proxy ile aynı olmalıdır. Uygulama yalnızca `127.0.0.1:3000` üzerinde yayınlanır; dış trafik için Nginx/Caddy ve TLS kullanılmalıdır.
+
+İlk clone işlemleri:
+
+```bash
+# staging VPS
+sudo mkdir -p /opt/voltflow-staging
+sudo chown -R deploy:deploy /opt/voltflow-staging
+git clone --branch staging https://github.com/murat-kacar/voltflow.git /opt/voltflow-staging
+
+# production VPS
+sudo mkdir -p /opt/voltflow-production
+sudo chown -R deploy:deploy /opt/voltflow-production
+git clone --branch main https://github.com/murat-kacar/voltflow.git /opt/voltflow-production
+```
+
+Her iki sunucuda `.env.production` dosyası ilgili path altında ayrı oluşturulur; dosya Git'e eklenmez.
 
 ## 4. Güncelleme ve geri dönüş
 
