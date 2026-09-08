@@ -2,9 +2,11 @@
 
 ## 1. GitHub hazırlığı
 
-Repository public veya private olarak oluşturulur ve mevcut proje `main` dalına gönderilir. `.env`, veritabanı dump'ları ve SSH anahtarları repository'ye eklenmez. GitHub Actions her push ve pull request'te `pnpm run check` ile `pnpm run build` çalıştırır.
+Repository public veya private olarak oluşturulur. `staging` dalı staging VPS'e, `main` dalı production VPS'e karşılık gelir. `.env`, veritabanı dump'ları ve SSH anahtarları repository'ye eklenmez. GitHub Actions her iki dalda ve pull request'te `pnpm run check` ile `pnpm run build` çalıştırır.
 
-Otomatik CD workflow'u için repository Settings → Secrets and variables → Actions altında şu secret'lar tanımlanır: `VPS_HOST`, `VPS_USER`, `VPS_SSH_KEY`, `VPS_SSH_PORT` (opsiyonel, varsayılan 22) ve `VPS_APP_PATH`. `VPS_APP_PATH`, VPS'te clone edilmiş repository'nin mutlak yoludur. CI başarılı olmadan CD çalışmaz.
+GitHub Settings → Environments altında `staging` ve `production` environment'ları oluşturulur. Her environment'ın kendi secret seti bulunur: `VPS_HOST`, `VPS_USER`, `VPS_SSH_KEY`, `VPS_SSH_PORT` (opsiyonel, varsayılan 22) ve `VPS_APP_PATH`. `VPS_APP_PATH`, ilgili VPS'te clone edilmiş repository'nin mutlak yoludur. `production` environment'ına en az bir Required reviewer eklenir; böylece `main` başarılı olsa bile production deploy'u manuel onay olmadan başlayamaz. CI başarılı olmadan CD çalışmaz.
+
+İş akışı: geliştirme → `staging` dalı → staging manuel kabul testi → pull request → `main` → production onayı. Staging ve production için farklı VPS, veritabanı, alan adı ve `BETTER_AUTH_SECRET` kullanılmalıdır.
 
 ## 2. VPS hazırlığı
 

@@ -4,18 +4,43 @@ on:
   workflow_run:
     workflows: [CI]
     types: [completed]
-    branches: [main]
+    branches: [main, staging]
 
 permissions:
   contents: read
 
 jobs:
-  deploy:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+  deploy-staging:
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'staging' }}
+    environment:
+      name: staging
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - name: Deploy over SSH
+      - name: Deploy to staging VPS over SSH
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_SSH_PORT || 22 }}
+          command_timeout: 10m
+          script: |
+            cd "${{ secrets.VPS_APP_PATH }}"
+            git pull --ff-only origin staging
+            docker compose --env-file .env.production -f docker-compose.production.yml build app
+            docker compose --profile tools --env-file .env.production -f docker-compose.production.yml run --rm migrator
+            docker compose --env-file .env.production -f docker-compose.production.yml up -d app
+            docker compose --env-file .env.production -f docker-compose.production.yml ps
+
+  deploy-production:
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main' }}
+    environment:
+      name: production
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Deploy to production VPS over SSH
         uses: appleboy/ssh-action@v1.2.2
         with:
           host: ${{ secrets.VPS_HOST }}
