@@ -6,7 +6,7 @@ Repository public veya private olarak oluşturulur. `staging` dalı staging VPS'
 
 GitHub Settings → Environments altında `staging` ve `production` environment'ları oluşturulur. Her environment'ın kendi secret seti bulunur: `VPS_HOST`, `VPS_USER`, `VPS_SSH_KEY`, `VPS_SSH_PORT` (opsiyonel, varsayılan 22) ve `VPS_APP_PATH`. `VPS_APP_PATH`, ilgili VPS'te clone edilmiş repository'nin mutlak yoludur. `production` environment'ına en az bir Required reviewer eklenir; böylece `main` başarılı olsa bile production deploy'u manuel onay olmadan başlayamaz. CI başarılı olmadan CD çalışmaz.
 
-İş akışı: geliştirme → `staging` dalı → staging manuel kabul testi → pull request → `main` → production onayı. Staging ve production için farklı VPS, veritabanı, alan adı ve `BETTER_AUTH_SECRET` kullanılmalıdır.
+İş akışı: geliştirme → `staging` dalı → staging otomatik deploy → manuel kabul testi → pull request → `main` → GitHub Actions'tan manuel `workflow_dispatch` → production onayı → production deploy. `main` push'u production deploy'u tetiklemez. Staging ve production için farklı VPS, veritabanı, alan adı ve `BETTER_AUTH_SECRET` kullanılmalıdır.
 
 ## 2. VPS hazırlığı
 
