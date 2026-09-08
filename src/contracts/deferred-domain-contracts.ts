@@ -70,9 +70,9 @@ export interface AuditTrailService {
 
 /**
  * 3. Rol Tabanlı Erişim Denetimi (RBAC & Tenant) Kontratı (AGENTS.md Kural 3.C)
- * Durum: DOĞAL EKSİK (İş modeline göre roller [admin, vendor, buyer, agent] kesinleştiğinde schema.ts'ye eklenecek)
+ * Durum: DOĞAL EKSİK (Bugünkü tek OFİS kullanıcısı modeli, saha personeli ve ayrık yetkiler devreye alındığında genişletilecek)
  */
-export type SystemRole = "SUPERADMIN" | "ADMIN" | "MEMBER" | "GUEST";
+export type SystemRole = "OFIS" | "USTA" | "ISCI" | "CIRAK";
 
 export interface RbacPolicyContract {
   readonly role: SystemRole;
@@ -160,26 +160,30 @@ export const DEFERRED_ARCHITECTURAL_REGISTRY = [
     id: "DEFERRED-002",
     name: "Database Idempotency Store",
     targetRule: "AGENTS.md Section 3.I",
-    currentImplementation: "None (Awaiting domain-specific mutations)",
+    currentImplementation:
+      "Active in schema.ts (execution_guards) & telemetry/idempotency guard",
     deferredReason:
-      "Ödeme veya hassas sipariş operasyonları henüz tanımlanmadığından tablo şeması ertelendi.",
+      "AKTİF: Tezgâh satışı ve şantiye sarfiyat işlemleri için idempotency kilidi bağlandı.",
     contractInterface: "IdempotencyExecutionContract",
   },
   {
     id: "DEFERRED-003",
     name: "Audit Trail Storage (audit_logs)",
     targetRule: "AGENTS.md Section 3.C",
-    currentImplementation: "None (Awaiting domain entities)",
+    currentImplementation:
+      "Active in schema.ts (incident_traces & stock_movements)",
     deferredReason:
-      "Hangi varlıkların denetleneceği (ürün, bakiye, fatura) domain netleşince Drizzle şemasına eklenecek.",
+      "AKTİF: Olay telemetrisi, stok hareketleri ve işlem denetim izi bağlandı.",
     contractInterface: "AuditTrailRecord",
   },
   {
     id: "DEFERRED-004",
     name: "RBAC & Multi-Tenant Schema",
     targetRule: "AGENTS.md Section 3.C",
-    currentImplementation: "Single Role (Standard User)",
-    deferredReason: "Pazar yeri / SaaS rollerinin kesinleşmesi bekleniyor.",
+    currentImplementation:
+      "Single OFIS operator profile; authenticated route-level access guard active",
+    deferredReason:
+      "Tek kullanıcı tüm operasyonları yürütür. USTA/ISCI/CIRAK kullanıcıları ve en az yetki politikaları saha fazında aktifleştirilecek.",
     contractInterface: "RbacPolicyContract",
   },
   {

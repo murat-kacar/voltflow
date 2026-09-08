@@ -32,7 +32,7 @@ Tahmin yürütmek, körlemesine dosya aramak ve tüm dosyayı baştan yazmak KES
 * **Faz 3 - Kontrat / Tip Önceliği (Spec-First):** Gövde kodunu değiştirmeden önce tip veya arayüz kontratını doğrula. Yeni bir iş mantığı (ödeme, yetki, denetim, dış entegrasyon) ekleniyorsa, `src/contracts/deferred-domain-contracts.ts` içindeki ilgili bekleyen kontratı implemente et ve durumunu güncelle.
 * **Faz 4 - Cerrahi Müdahale:** Sadece `replace_file_content` veya `multi_replace_file_content` ile nokta atışı yama yap. Üretilen gövde kodu **Bölüm 3'teki Kanonik Standartlara (Validation, Idempotency, AAA, Loglama)** eksiksiz uymak zorundadır.
 * **Faz 5 - Kapalı Döngü Doğrulama:** Değişiklik sonrası `pnpm run check` (Biome + tsc) çalıştır, testleri yürüt. Hata varsa kullanıcıya bildirmeden önce kendi içinde düzelt.
-* **Faz 6 - Graf Senkronizasyonu:** Yapısal bir değişiklik yapıldıysa terminalde `pnpm run graph` çalıştırarak haritayı güncelle.
+* **Faz 6 - Graf ve Etkileşim Haritası Senkronizasyonu:** Yapısal bir değişiklik yapıldıysa terminalde `pnpm run graph` çalıştırarak haritayı güncelle. Kullanıcı deneyimi, ekranlar veya operasyonel akışlarda (Happy Paths) bir değişiklik veya ekleme olduğunda `docs/OPERATIONAL_INTERACTION_MAP.md` senkronize biçimde eşzamanlı güncellenmelidir.
 
 
 ---
@@ -113,6 +113,9 @@ Yapay zekanın zamanla dokümanları ve kodları çöplüğe çevirmesini (Appen
 
 ### C. Hiyerarşi Koruma ve Periyodik Temizlik (Refactoring)
 - Kural ve kod dosyaları daima mantıksal bir hiyerarşide (Genel İlkeler -> Modüller -> Detaylar) tutulmalıdır. Dağılan yapılar periyodik olarak derlenip toparlanmalıdır.
+
+### D. Canlı Etkileşim Haritası Bütünlüğü (Living Interaction Map)
+- Operasyonel iş akışı, ekranlar, activatörler ve Happy Path değişiklikleri anında `docs/OPERATIONAL_INTERACTION_MAP.md`'ye yansıtılmalı; kod ile etkileşim haritası asla birbirinden kopuk bırakılmamalıdır.
 
 
 

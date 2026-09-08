@@ -15,6 +15,27 @@
       "when": 1788688076120,
       "tag": "0001_happy_sheva_callister",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1788710042779,
+      "tag": "0002_magenta_silver_surfer",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1788793519564,
+      "tag": "0003_wise_lorna_dane",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1788853093658,
+      "tag": "0004_steady_rumiko_fujikawa",
+      "breakpoints": true
     }
   ]
 }

@@ -1,0 +1,55 @@
+{
+  "name": "Voltflow ERP - Elektrik Ticaret & Şantiye Komuta Merkezi",
+  "short_name": "Voltflow ERP",
+  "description": "Elektrikçi Perakende Satış, Mal Kabul ve Şantiye Taahhüt Yönetim Sistemi",
+  "start_url": "/",
+  "id": "/",
+  "display": "standalone",
+  "background_color": "#0a0d14",
+  "theme_color": "#0a0d14",
+  "orientation": "any",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "1. Tezgâh Satış",
+      "short_name": "Tezgâh POS",
+      "description": "Hızlı Tezgâh Satış Terminali",
+      "url": "/?station=POS",
+      "icons": [{ "src": "/icon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "2. Mal Kabul",
+      "short_name": "Mal Kabul",
+      "description": "Toptancı Fatura Giriş Kalkanı",
+      "url": "/?station=PROCUREMENT",
+      "icons": [{ "src": "/icon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "3. Operasyon & Şantiye",
+      "short_name": "Şantiye & Kasa",
+      "description": "Şantiyeler, Puantaj, Hakediş ve Tahsilat",
+      "url": "/?station=OPERATIONS",
+      "icons": [{ "src": "/icon.svg", "sizes": "any" }]
+    }
+  ]
+}

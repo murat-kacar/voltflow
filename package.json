@@ -8,9 +8,12 @@
     "start": "next start",
     "lint": "biome check src",
     "test": "vitest run",
+    "test:integration": "tsx scripts/run-integration-tests.ts",
+    "verify:staging": "tsx scripts/verify-staging.ts",
     "check": "biome check src && tsc --noEmit && vitest run",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
+    "db:seed": "tsx src/db/seed.ts",
     "graph": "graphify extract . --code-only && graphify cluster-only ."
   },
   "dependencies": {
@@ -30,6 +33,7 @@
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",
     "drizzle-kit": "^0.31.10",
+    "tsx": "^4.23.13",
     "typescript": "7.0.2",
     "vitest": "^5.0.0"
   },

@@ -21,3 +21,17 @@ export const env = envSchema.parse({
   BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET,
   BETTER_AUTH_URL: process.env.BETTER_AUTH_URL,
 });
+
+export function assertProductionConfiguration(): void {
+  if (process.env.NODE_ENV !== "production") return;
+  if (
+    !process.env.DATABASE_URL ||
+    !process.env.BETTER_AUTH_SECRET ||
+    !process.env.BETTER_AUTH_URL ||
+    process.env.BETTER_AUTH_SECRET === "supersecretdevelopmentkey12345678"
+  ) {
+    throw new Error(
+      "Production yapılandırması eksik veya development secret kullanıyor.",
+    );
+  }
+}

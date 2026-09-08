@@ -55,11 +55,31 @@ export function createErrorResponse(
       success: false,
       error: {
         code,
-        message,
+        message:
+          status >= 500
+            ? "İşlem tamamlanamadı. Lütfen tekrar deneyin."
+            : message,
         details,
         traceId,
       },
     },
     { status },
+  );
+}
+
+export function createSafeErrorResponse(
+  code: string,
+  status: number,
+  details?: ApiErrorDetail[],
+  traceId?: string,
+): NextResponse<ApiErrorResponse> {
+  return createErrorResponse(
+    code,
+    status >= 500
+      ? "İşlem tamamlanamadı. Lütfen tekrar deneyin."
+      : "İstek işlenemedi.",
+    status,
+    details,
+    traceId,
   );
 }

@@ -1,0 +1,1 @@
+ALTER TABLE "employee_profiles" ALTER COLUMN "role" SET DEFAULT 'OFIS';
