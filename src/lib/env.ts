@@ -7,7 +7,7 @@ const envSchema = z.object({
   DATABASE_URL: z
     .string()
     .url()
-    .default("postgres://postgres:postgres@localhost:5432/gag_db"),
+    .default("postgres://postgres:postgres@localhost:5432/voltflow_db"),
   BETTER_AUTH_SECRET: z
     .string()
     .min(16)

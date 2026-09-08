@@ -341,7 +341,7 @@ export default function HomePage() {
       >
         <div>
           VOLTFLOW ERP v1.0.0 &bull; 100% Sıfır-NULL &bull; Çift Taraflı Defter
-          Koruması &bull; GAG Mimarisi
+          Koruması &bull; Voltflow Mimarisi
         </div>
         <div>Rol: OFİS &bull; Durum: Çevrimiçi</div>
       </footer>

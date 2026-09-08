@@ -20,10 +20,10 @@ VPS üzerinde Docker ve Compose Plugin kurulmalıdır. Repository VPS'e clone ed
 Her VPS'te `VPS_APP_PATH`, tabloda belirtilen mutlak yol olmalıdır. İki ortam aynı VPS üzerinde çalıştırılmamalı; staging verisi production veritabanına veya secret'ına bağlanmamalıdır.
 
 ```env
-POSTGRES_DB=gag
-POSTGRES_USER=gag
+POSTGRES_DB=voltflow
+POSTGRES_USER=voltflow
 POSTGRES_PASSWORD=<uzun-rastgele-parola>
-DATABASE_URL=postgres://gag:<uzun-rastgele-parola>@db:5432/gag
+DATABASE_URL=postgres://voltflow:<uzun-rastgele-parola>@db:5432/voltflow
 BETTER_AUTH_SECRET=<en-az-32-karakter-rastgele-secret>
 BETTER_AUTH_URL=https://alan-adiniz.example
 ```
